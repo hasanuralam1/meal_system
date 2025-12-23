@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meals Page</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center h-14">
+
+        <!-- Left Menu -->
+        <div class="flex space-x-4 text-sm font-semibold text-gray-700">
+          <a href="index.html" class="hover:text-blue-600">Dashboard</a>
+          <a href="users.html" class="hover:text-blue-600">Users</a>
+          <a href="deposit.html" class="hover:text-blue-600">Deposite</a>
+          <a href="meals.html" class="text-blue-600">Meals</a>
+          <a href="marketing.html" class="hover:text-blue-600">Marketing</a>
+          <a href="dustbin.html" class="hover:text-blue-600">Dustbin</a>
+        </div>
+
+        <!-- Right Buttons -->
+        <div class="flex space-x-3">
+          <button class="flex items-center gap-1 text-sm px-3 py-1 border rounded hover:bg-gray-100">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Login
+          </button>
+          <button class="flex items-center gap-1 text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto p-4">
+
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+
+      <!-- TABLE -->
+      <table class="w-full border-collapse">
+        <thead class="bg-gray-200 text-gray-700 text-sm">
+          <tr>
+            <th class="border p-2">SL No</th>
+            <th class="border p-2">ID</th>
+            <th class="border p-2">Meal Name</th>
+            <th class="border p-2">Date</th>
+            <th class="border p-2">Day</th>
+            <th class="border p-2">Night</th>
+            <th class="border p-2">Day Name</th>
+          </tr>
+        </thead>
+
+        <tbody class="text-sm text-center">
+
+          <!-- Row 1 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">1</td>
+            <td class="border p-2">M001</td>
+            <td class="border p-2">Rice & Chicken</td>
+            <td class="border p-2">2025-01-05</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">Sunday</td>
+          </tr>
+
+          <!-- Row 2 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">2</td>
+            <td class="border p-2">M002</td>
+            <td class="border p-2">Rice & Fish</td>
+            <td class="border p-2">2025-01-06</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">No</td>
+            <td class="border p-2">Monday</td>
+          </tr>
+
+          <!-- Row 3 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">3</td>
+            <td class="border p-2">M003</td>
+            <td class="border p-2">Rice & Egg</td>
+            <td class="border p-2">2025-01-07</td>
+            <td class="border p-2">No</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">Tuesday</td>
+          </tr>
+
+          <!-- Row 4 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">4</td>
+            <td class="border p-2">M004</td>
+            <td class="border p-2">Rice & Beef</td>
+            <td class="border p-2">2025-01-08</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">Wednesday</td>
+          </tr>
+
+          <!-- Row 5 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">5</td>
+            <td class="border p-2">M005</td>
+            <td class="border p-2">Veg Meal</td>
+            <td class="border p-2">2025-01-09</td>
+            <td class="border p-2">Yes</td>
+            <td class="border p-2">No</td>
+            <td class="border p-2">Thursday</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+  </main>
+
+</body>
+</html>

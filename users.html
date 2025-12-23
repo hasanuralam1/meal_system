@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Users Page</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex justify-between items-center h-14">
+
+        <!-- Left Menu -->
+        <div class="flex space-x-4 text-sm font-semibold text-gray-700">
+          <a href="index.html" class="hover:text-blue-600">Dashboard</a>
+          <a href="users.html" class="text-blue-600">Users</a>
+          <a href="deposit.html" class="hover:text-blue-600">Deposite</a>
+          <a href="meals.html" class="hover:text-blue-600">Meals</a>
+          <a href="marketing.html" class="hover:text-blue-600">Marketing</a>
+          <a href="dustbin.html" class="hover:text-blue-600">Dustbin</a>
+        </div>
+
+        <!-- Right Buttons -->
+        <div class="flex space-x-3">
+          <button class="flex items-center gap-1 text-sm px-3 py-1 border rounded hover:bg-gray-100">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Login
+          </button>
+          <button class="flex items-center gap-1 text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto p-4">
+
+    <div class="bg-white shadow rounded-lg overflow-x-auto">
+
+      <!-- TABLE -->
+      <table class="w-full border-collapse">
+        <thead class="bg-gray-200 text-gray-700 text-sm">
+          <tr>
+            <th class="border p-2">SL</th>
+            <th class="border p-2">ID</th>
+            <th class="border p-2">Name</th>
+            <th class="border p-2">Email</th>
+            <th class="border p-2">Phone</th>
+            <th class="border p-2">Status</th>
+            <th class="border p-2">Role</th>
+            <th class="border p-2">Action</th>
+          </tr>
+        </thead>
+
+        <tbody class="text-sm text-center">
+
+          <!-- Row 1 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">1</td>
+            <td class="border p-2">101</td>
+            <td class="border p-2">Hasanur Alam</td>
+            <td class="border p-2">hasanur@mail.com</td>
+            <td class="border p-2">01700000001</td>
+            <td class="border p-2">
+              <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Active</span>
+            </td>
+            <td class="border p-2">User</td>
+            <td class="border p-2 space-x-1">
+              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+
+          <!-- Row 2 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">2</td>
+            <td class="border p-2">102</td>
+            <td class="border p-2">Rahim Khan</td>
+            <td class="border p-2">rahim@mail.com</td>
+            <td class="border p-2">01700000002</td>
+            <td class="border p-2">
+              <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Active</span>
+            </td>
+            <td class="border p-2">Manager</td>
+            <td class="border p-2 space-x-1">
+              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+
+          <!-- Row 3 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">3</td>
+            <td class="border p-2">103</td>
+            <td class="border p-2">Karim Ali</td>
+            <td class="border p-2">karim@mail.com</td>
+            <td class="border p-2">01700000003</td>
+            <td class="border p-2">
+              <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">Deactive</span>
+            </td>
+            <td class="border p-2">User</td>
+            <td class="border p-2 space-x-1">
+              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+
+          <!-- Row 4 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">4</td>
+            <td class="border p-2">104</td>
+            <td class="border p-2">Salman Noor</td>
+            <td class="border p-2">salman@mail.com</td>
+            <td class="border p-2">01700000004</td>
+            <td class="border p-2">
+              <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Active</span>
+            </td>
+            <td class="border p-2">User</td>
+            <td class="border p-2 space-x-1">
+              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+
+          <!-- Row 5 -->
+          <tr class="hover:bg-gray-50">
+            <td class="border p-2">5</td>
+            <td class="border p-2">105</td>
+            <td class="border p-2">Imran Hossain</td>
+            <td class="border p-2">imran@mail.com</td>
+            <td class="border p-2">01700000005</td>
+            <td class="border p-2">
+              <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Active</span>
+            </td>
+            <td class="border p-2">Manager</td>
+            <td class="border p-2 space-x-1">
+              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+  </main>
+
+</body>
+
+</html>
