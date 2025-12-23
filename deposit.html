@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,15 +13,15 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
   <!-- NAVBAR -->
-  <nav class="bg-white shadow-md">
+  <nav class="bg-white shadow relative z-50">
     <div class="max-w-7xl mx-auto px-4">
-      <div class="flex justify-between items-center h-14">
+      <div class="flex justify-between items-center h-12">
 
-        <!-- Left Menu -->
-        <div class="flex space-x-4 text-sm font-semibold text-gray-700">
+        <!-- Title -->
+        <div class="hidden md:flex gap-4 text-sm font-medium text-gray-700">
           <a href="index.html" class="hover:text-blue-600">Dashboard</a>
           <a href="users.html" class="hover:text-blue-600">Users</a>
           <a href="deposit.html" class="text-blue-600">Deposite</a>
@@ -41,25 +42,44 @@
           </button>
         </div>
 
+        <!-- Hamburger -->
+        <button id="menuBtn" class="md:hidden text-gray-700 text-lg">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu (OVERLAY – DOES NOT PUSH CONTENT) -->
+    <div id="mobileMenu" class="hidden md:hidden absolute top-12 left-0 w-full bg-white border-t shadow-lg">
+      <div class="px-4 py-3 space-y-2 text-sm text-gray-700">
+        <a href="index.html" class="block font-semibold">Dashboard</a>
+        <a href="users.html" class="block">Users</a>
+        <a href="deposit.html" class="block">Deposite</a>
+        <a href="meals.html" class="block">Meals</a>
+        <a href="marketing.html" class="block">Marketing</a>
+        <a href="dustbin.html" class="block">Dustbin</a>
       </div>
     </div>
   </nav>
 
+
+
+
   <!-- MAIN CONTENT -->
-  <main class="max-w-7xl mx-auto p-4">
+  <main class="max-w-7xl mx-auto w-full px-4 py-6 flex-1 space-y-6">
 
     <div class="bg-white shadow rounded-lg overflow-x-auto">
 
       <!-- TABLE -->
-      <table class="w-full border-collapse">
-        <thead class="bg-gray-200 text-gray-700 text-sm">
-          <tr >
-            <th class="border p-2">SL No</th>
-            <th class="border p-2">ID</th>
-            <th class="border p-2">User ID</th>
-            <th class="border p-2">Amount</th>
-            <th class="border p-2">Date</th>
-            <th class="border p-2">Mode</th>
+      <table class="w-full min-w-[900px] text-sm text-center border-collapse">
+        <thead class="bg-gray-200 text-gray-700">
+          <tr>
+            <th class="border px-4 py-3">SL No</th>
+            <th class="border px-4 py-3">ID</th>
+            <th class="border px-4 py-3">User ID</th>
+            <th class="border px-4 py-3">Amount</th>
+            <th class="border px-4 py-3">Date</th>
+            <th class="border px-4 py-3">Mode</th>
           </tr>
         </thead>
 
@@ -67,52 +87,52 @@
 
           <!-- Row 1 -->
           <tr class="hover:bg-gray-50">
-            <td class="border p-2">1</td>
-            <td class="border p-2">D001</td>
-            <td class="border p-2">U001</td>
-            <td class="border p-2">₹1,500</td>
-            <td class="border p-2">2025-01-05</td>
-            <td class="border p-2">Cash</td>
+            <td class="border px-4 py-3">1</td>
+            <td class="border px-4 py-3">D001</td>
+            <td class="border px-4 py-3">U001</td>
+            <td class="border px-4 py-3">₹1,500</td>
+            <td class="border px-4 py-3">2025-01-05</td>
+            <td class="border px-4 py-3">Cash</td>
           </tr>
 
           <!-- Row 2 -->
           <tr class="hover:bg-gray-50">
-            <td class="border p-2">2</td>
-            <td class="border p-2">D002</td>
-            <td class="border p-2">U002</td>
-            <td class="border p-2">₹2,000</td>
-            <td class="border p-2">2025-01-08</td>
-            <td class="border p-2">UPI</td>
+            <td class="border px-4 py-3">2</td>
+            <td class="border px-4 py-3">D002</td>
+            <td class="border px-4 py-3">U002</td>
+            <td class="border px-4 py-3">₹2,000</td>
+            <td class="border px-4 py-3">2025-01-08</td>
+            <td class="border px-4 py-3">UPI</td>
           </tr>
 
           <!-- Row 3 -->
           <tr class="hover:bg-gray-50">
-            <td class="border p-2">3</td>
-            <td class="border p-2">D003</td>
-            <td class="border p-2">U003</td>
-            <td class="border p-2">₹1,200</td>
-            <td class="border p-2">2025-01-10</td>
-            <td class="border p-2">Bank</td>
+            <td class="border px-4 py-3">3</td>
+            <td class="border px-4 py-3">D003</td>
+            <td class="border px-4 py-3">U003</td>
+            <td class="border px-4 py-3">₹1,200</td>
+            <td class="border px-4 py-3">2025-01-10</td>
+            <td class="border px-4 py-3">Bank</td>
           </tr>
 
           <!-- Row 4 -->
           <tr class="hover:bg-gray-50">
-            <td class="border p-2">4</td>
-            <td class="border p-2">D004</td>
-            <td class="border p-2">U004</td>
-            <td class="border p-2">₹3,000</td>
-            <td class="border p-2">2025-01-15</td>
-            <td class="border p-2">Cash</td>
+            <td class="border px-4 py-3">4</td>
+            <td class="border px-4 py-3">D004</td>
+            <td class="border px-4 py-3">U004</td>
+            <td class="border px-4 py-3">₹3,000</td>
+            <td class="border px-4 py-3">2025-01-15</td>
+            <td class="border px-4 py-3">Cash</td>
           </tr>
 
           <!-- Row 5 -->
           <tr class="hover:bg-gray-50">
-            <td class="border p-2">5</td>
-            <td class="border p-2">D005</td>
-            <td class="border p-2">U005</td>
-            <td class="border p-2">₹1,800</td>
-            <td class="border p-2">2025-01-18</td>
-            <td class="border p-2">UPI</td>
+            <td class="border px-4 py-3">5</td>
+            <td class="border px-4 py-3">D005</td>
+            <td class="border px-4 py-3">U005</td>
+            <td class="border px-4 py-3">₹1,800</td>
+            <td class="border px-4 py-3">2025-01-18</td>
+            <td class="border px-4 py-3">UPI</td>
           </tr>
 
         </tbody>
@@ -121,5 +141,23 @@
     </div>
   </main>
 
+  <!-- FOOTER -->
+  <footer class="bg-white border-t">
+    <p class="text-center text-xs text-gray-600 py-3">
+      © 2025 Hasanur Admin Panel
+    </p>
+  </footer>
+
+  <!-- HAMBURGER SCRIPT -->
+  <script>
+    const btn = document.getElementById("menuBtn");
+    const menu = document.getElementById("mobileMenu");
+
+    btn.addEventListener("click", () => {
+      menu.classList.toggle("hidden");
+    });
+  </script>
+
 </body>
+
 </html>
