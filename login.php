@@ -80,45 +80,58 @@ require_once "config/config.php";
   </script>
 
   <!-- Login API Script -->
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
+ <script>
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const errorMsg = document.getElementById("errorMsg");
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const errorMsg = document.getElementById("errorMsg");
 
-      errorMsg.classList.add("hidden");
+  errorMsg.classList.add("hidden");
 
-      try {
-        const response = await fetch(`${BASE_URL}/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            email: email,
-            password: password
-          })
-        });
-
-        const result = await response.json();
-
-        if (result.status === true) {
-          localStorage.setItem("auth_token", result.token);
-          localStorage.setItem("user_name", result.data.name);
-
-          window.location.href = "dashboard.php";
-        } else {
-          errorMsg.textContent = result.message || "Invalid login credentials";
-          errorMsg.classList.remove("hidden");
-        }
-      } catch (err) {
-        errorMsg.textContent = "Server error. Try again later.";
-        errorMsg.classList.remove("hidden");
-      }
+  try {
+    const res = await fetch(`${BASE_URL}/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
     });
-  </script>
+
+    const data = await res.json();
+    console.log("LOGIN RESPONSE:", data);
+
+    if (data.status) {
+      // Normalize role
+      const role = data.data.role ? data.data.role.toLowerCase() : "user";
+
+      localStorage.setItem("auth_token", data.token);
+      localStorage.setItem("user_name", data.data.name);
+      localStorage.setItem("user_role", role);
+
+      // Role-based redirect
+      if (role === "admin") {
+        window.location.replace("admin/dashboard.php");
+      } else {
+        window.location.replace("dashboard.php");
+      }
+    } else {
+      errorMsg.textContent = data.message || "Invalid login credentials";
+      errorMsg.classList.remove("hidden");
+    }
+
+  } catch (err) {
+    console.error(err);
+    errorMsg.textContent = "Server error. Please try again.";
+    errorMsg.classList.remove("hidden");
+  }
+});
+</script>
+
 
 </body>
 </html>
