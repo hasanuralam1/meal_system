@@ -1,6 +1,6 @@
 
 
-<?php include('header.php') ?>
+<?php include('header.php'); include('config/config.php') ?>
 
 
   <!-- MAIN CONTENT -->
@@ -21,82 +21,7 @@
           </tr>
         </thead>
 
-        <tbody class="text-sm text-center">
-
-          <!-- Row 1 -->
-          <tr class="hover:bg-gray-50">
-            <td class="border px-4 py-3">1</td>
-            <td class="border px-4 py-3">DB001</td>
-            <td class="border px-4 py-3">U001</td>
-            <td class="border px-4 py-3">2025-01-05</td>
-            <td class="border px-4 py-3">Sunday</td>
-            <td class="border p-2 space-x-1">
-              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
-              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-            </td>
-          </tr>
-          </tr>
-
-          <!-- Row 2 -->
-          <tr class="hover:bg-gray-50">
-            <td class="border px-4 py-3">2</td>
-            <td class="border px-4 py-3">DB002</td>
-            <td class="border px-4 py-3">U002</td>
-            <td class="border px-4 py-3">2025-01-06</td>
-            <td class="border px-4 py-3">Monday</td>
-            <td class="border p-2 space-x-1">
-              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
-              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-            </td>
-          </tr>
-          </tr>
-
-          <!-- Row 3 -->
-          <tr class="hover:bg-gray-50">
-            <td class="border px-4 py-3">3</td>
-            <td class="border px-4 py-3">DB003</td>
-            <td class="border px-4 py-3">U003</td>
-            <td class="border px-4 py-3">2025-01-07</td>
-            <td class="border px-4 py-3">Tuesday</td>
-            <td class="border p-2 space-x-1">
-              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
-              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-            </td>
-          </tr>
-          </tr>
-
-          <!-- Row 4 -->
-          <tr class="hover:bg-gray-50">
-            <td class="border px-4 py-3">4</td>
-            <td class="border px-4 py-3">DB004</td>
-            <td class="border px-4 py-3">U004</td>
-            <td class="border px-4 py-3">2025-01-08</td>
-            <td class="border px-4 py-3">Wednesday</td>
-            <td class="border p-2 space-x-1">
-              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
-              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-            </td>
-          </tr>
-          </tr>
-
-          <!-- Row 5 -->
-          <tr class="hover:bg-gray-50">
-            <td class="border px-4 py-3">5</td>
-            <td class="border px-4 py-3">DB005</td>
-            <td class="border px-4 py-3">U005</td>
-            <td class="border px-4 py-3">2025-01-09</td>
-            <td class="border px-4 py-3">Thursday</td>
-            <td class="border p-2 space-x-1">
-              <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
-              <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-              <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-            </td>
-          </tr>
-          </tr>
+        <tbody id="dustbinTableBody" class="text-sm text-center">      
 
         </tbody>
       </table>
@@ -106,3 +31,58 @@
 
   
   <?php include('footer.php') ?>
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+   const BASE_URL = "<?= BASE_URL ?>";
+  const token = localStorage.getItem("auth_token");
+
+  if (!token) {
+    alert("Auth token not found. Please login again.");
+    return;
+  }
+
+  fetch(`${BASE_URL}/dustbin/fetch_all`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    }
+  })
+  .then(response => response.json())
+  .then(result => {
+
+    if (!result.status) {
+      alert("Failed to fetch data");
+      return;
+    }
+
+    const tbody = document.getElementById("dustbinTableBody");
+    tbody.innerHTML = "";
+
+    result.data.forEach((item, index) => {
+
+      tbody.insertAdjacentHTML("beforeend", `
+        <tr class="hover:bg-gray-50">
+          <td class="border px-4 py-3">${index + 1}</td>
+          <td class="border px-4 py-3">${item.id}</td>
+          <td class="border px-4 py-3">${item.user_id}</td>
+          <td class="border px-4 py-3">${item.date}</td>
+          <td class="border px-4 py-3 capitalize">${item.day_name}</td>
+          <td class="border p-2 space-x-1">
+            <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+            <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+          </td>
+        </tr>
+      `);
+    });
+
+  })
+  .catch(error => {
+    console.error("API Error:", error);
+    alert("Something went wrong while fetching data.");
+  });
+
+});
+</script>

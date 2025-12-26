@@ -5,28 +5,53 @@
         const token = localStorage.getItem("auth_token");
         const role  = localStorage.getItem("user_role");
 
-        // ===== GLOBAL AUTH GUARD =====
-        if (!token && !window.location.pathname.includes("login.php")) {
+        const loginBtn  = document.getElementById("loginBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        const isLoginPage = window.location.pathname.includes("login.php");
+        const isAdminPage = window.location.pathname.includes("/admin/");
+
+        /* ===============================
+           AUTH GUARD
+        =============================== */
+
+        if (!token && !isLoginPage) {
             redirectToLogin();
             return;
         }
 
-        const isAdminPage = window.location.pathname.includes("/admin/");
-
         if (token) {
+            // Role protection
             if (isAdminPage && role !== "admin") {
                 forceLogout();
+                return;
             }
 
             if (!isAdminPage && role !== "user") {
                 forceLogout();
+                return;
             }
         }
+
+        /* ===============================
+           NAVBAR BUTTON STATE
+        =============================== */
+
+        if (token) {
+            loginBtn?.classList.add("hidden");
+            logoutBtn?.classList.remove("hidden");
+        } else {
+            loginBtn?.classList.remove("hidden");
+            logoutBtn?.classList.add("hidden");
+        }
+
     });
 
 })();
 
-// ===== LOGOUT WITH API =====
+/* ===============================
+   LOGOUT
+=============================== */
 async function logout() {
     const token = localStorage.getItem("auth_token");
 
@@ -35,34 +60,30 @@ async function logout() {
             await fetch(`${BASE_URL}/logout`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
                 }
             });
         }
-    } catch (error) {
-        // API failure should not block logout
-        console.error("Logout API error:", error);
+    } catch (e) {
+        console.warn("Logout API failed");
     } finally {
         localStorage.clear();
         redirectToLogin();
     }
 }
 
-// ===== HELPERS =====
+/* ===============================
+   HELPERS
+=============================== */
 function redirectToLogin() {
-    alert("redirectToLogin 54 line");
     window.location.href = getRootPath() + "login.php";
 }
 
 function forceLogout() {
-    alert("force logout 58 line");
-    // localStorage.clear();
-    // redirectToLogin();
+    localStorage.clear();
+    redirectToLogin();
 }
 
 function getRootPath() {
-    alert("getRootPath 64 line");
-    // handles /admin/* and root pages
     return window.location.pathname.includes("/admin/") ? "../" : "";
 }

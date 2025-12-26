@@ -68,4 +68,4 @@
             </div>
         </div>
     </nav>
-    <!-- <script src="config/auth.js"></script> -->
+    <script src="config/auth.js"></script>
