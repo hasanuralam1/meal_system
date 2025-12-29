@@ -37,12 +37,12 @@
     class="bg-white w-64 min-h-screen shadow-md fixed md:static transform -translate-x-full md:translate-x-0 transition duration-300 z-50">
 
     <nav class="p-6 space-y-4 text-gray-700">
-      <a href="#" class="block px-4 py-2 rounded bg-indigo-600 text-white">Dashboard</a>
+      <a href="" class="block px-4 py-2 rounded bg-indigo-600 text-white">Dashboard</a>
       <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Users</a>
       <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Meals</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Orders</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Deposits</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Settings</a>
+      <a href="marketing.php" class="block px-4 py-2 rounded hover:bg-gray-100">marketing</a>
+      <a href="deposit.php" class="block px-4 py-2 rounded hover:bg-gray-100">deposit</a>
+      <a href="dustbin.php" class="block px-4 py-2 rounded hover:bg-gray-100">dustbin</a>
       <a href="#" class="block px-4 py-2 rounded text-red-600 hover:bg-red-50">Logout</a>
     </nav>
   </aside>

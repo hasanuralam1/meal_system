@@ -1,6 +1,6 @@
 
 
-<?php include('header.php'); include('config/config.php') ?>
+<?php include('header.php'); include('config.php') ?>
 
 
   <!-- MAIN CONTENT -->
@@ -219,8 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td class="border px-4 py-3">₹${item.price}</td>
                     <td class="border px-4 py-3">${item.date}</td>
                     <td class="border p-2 space-x-1">
-                        <button
-  class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
+                        <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
   onclick="viewMarketing(${item.id})">
   View
 </button>
@@ -230,10 +229,12 @@ document.addEventListener("DOMContentLoaded", function () {
   onclick="openEditMarketing(${item.id}, '${item.market}', '${item.price}', '${item.date}', '${item.user_id}')">
   Edit
 </button>
+<button
+  class="px-2 py-1 text-xs bg-red-500 text-white rounded"
+  onclick="deleteMarketing(${item.id})">
+  Delete
+</button>
 
-                        <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">
-                            Delete
-                        </button>
                     </td>
                 </tr>
             `;
@@ -390,6 +391,7 @@ function closeEditModal() {
 
 document.getElementById("editMarketingForm").addEventListener("submit", function (e) {
     e.preventDefault();
+    const BASE_URL = "<?= BASE_URL ?>";
 
     const authToken = localStorage.getItem("auth_token");
 
@@ -417,9 +419,9 @@ document.getElementById("editMarketingForm").addEventListener("submit", function
     .then(res => res.json())
     .then(result => {
         if (result.status) {
-            alert(result.message);
+            // alert(result.message);
             closeEditModal();
-            location.reload();
+           location.reload();
         } else {
             alert("Failed to update marketing");
         }
@@ -429,6 +431,47 @@ document.getElementById("editMarketingForm").addEventListener("submit", function
         alert("Something went wrong");
     });
 });
+</script>
+
+
+
+
+
+<script>
+function deleteMarketing(id) {
+
+    if (!confirm("Are you sure you want to delete this marketing entry?")) {
+        return;
+    }
+
+    const authToken = localStorage.getItem("auth_token");
+
+    if (!authToken) {
+        alert("Authentication token missing");
+        return;
+    }
+
+    fetch(`<?= BASE_URL ?>/marketing/delete/${id}`, {
+        method: "DELETE",
+        headers: {
+             "Authorization": `Bearer ${authToken}`,
+            "Accept": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.status) {
+            alert(result.message);
+            location.reload(); // refresh table
+        } else {
+            alert("Failed to delete marketing entry");
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Something went wrong");
+    });
+}
 </script>
 
 
