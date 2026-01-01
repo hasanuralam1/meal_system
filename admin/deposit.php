@@ -151,7 +151,10 @@
 </div>
 
     
- 
+ <?php include('footer.php') ?>
+
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -480,4 +483,4 @@ function saveDeposit() {
 
 
 
-  <?php include('footer.php') ?>
+  

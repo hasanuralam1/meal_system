@@ -26,6 +26,7 @@
                     <a href="users.php" class="hover:text-blue-600">Users</a>
                     <a href="deposit.php" class="hover:text-blue-600">Deposite</a>
                     <a href="meals.php" class="hover:text-blue-600">Meals</a>
+                    <a href="user_meal.php" class="hover:text-blue-600">User Meals</a>
                     <a href="marketing.php" class="hover:text-blue-600">Marketing</a>
                     <a href="dustbin.php" class="hover:text-blue-600">Dustbin</a>
                 </div>

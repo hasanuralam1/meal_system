@@ -23,7 +23,7 @@
                 <!-- Title -->
                 <div class="hidden md:flex gap-4 text-sm font-medium text-gray-700">
                     <a href="dashboard.php" class="hover:text-blue-600">Dashboard</a>
-                    <a href="users.php" class="hover:text-blue-600">Users</a>
+                    <a href="user_meal.php" class="hover:text-blue-600">Users Meal</a>
                     <a href="deposit.php" class="hover:text-blue-600">Deposite</a>
                     <a href="meals.php" class="hover:text-blue-600">Meals</a>
                     <a href="marketing.php" class="hover:text-blue-600">Marketing</a>
@@ -63,6 +63,7 @@
                 <a href="users.php" class="block">Users</a>
                 <a href="deposit.php" class="block">Deposite</a>
                 <a href="meals.php" class="block">Meals</a>
+                <a href="user_meal.php" class="block">User Meals</a>
                 <a href="marketing.php" class="block">Marketing</a>
                 <a href="dustbin.php" class="block">Dustbin</a>
             </div>
