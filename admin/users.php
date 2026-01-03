@@ -1,5 +1,5 @@
 
-<?php include('header.php') ?>
+<?php include('header.php'); include('config.php') ?>
  
 
   <!-- MAIN CONTENT -->
@@ -22,87 +22,80 @@
             </tr>
           </thead>
 
-          <tbody class="text-sm text-center">
+          <tbody  id="userTableBody" class="text-sm text-center">
 
-            <!-- Row 1 -->
-            <tr class="hover:bg-gray-50">
-              <td class="border px-4 py-3">1</td>
-              <td class="border px-4 py-3">1</td>
-              <td class="border px-4 py-3">Hasanur Alam</td>
-              <td class="border px-4 py-3">hasanur@mail.com</td>
-              <td class="border px-4 py-3">01700000001</td>
-              <td class="border px-4 py-3">
-                <span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Active</span>
-              </td>
-              <td class="border p-2">User</td>
-              <td class="border p-2 space-x-1">
-                <button onclick="viewUser(1)"class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
-
-                <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-                <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-              </td>
-            </tr>
+            
           </tbody>
         </table>
 
     </div>
   </main>
 
-  <script>
+
+
+ <script>
 const BASE_URL = "<?= BASE_URL ?>";
 
-async function viewUser(userId) {
-  const token = localStorage.getItem("auth_token");
+document.addEventListener("DOMContentLoaded", function () {
+    fetchUsers();
+});
 
-  if (!token) {
-    alert("Unauthorized");
-    return;
-  }
+async function fetchUsers() {
+    const auth_token = localStorage.getItem("auth_token");
+    const tbody = document.getElementById("userTableBody");
 
-  try {
-    const res = await fetch(`${BASE_URL}/users/${userId}`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/json"
-      }
-    });
+    try {
+        const response = await fetch(`${BASE_URL}/users`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${auth_token}`
+            }
+        });
 
-    const result = await res.json();
-    console.log("USER VIEW RESPONSE:", result);
+        const res = await response.json();
 
-    if (!result.status) {
-      alert("Failed to load user");
-      return;
+        if (res.status && Array.isArray(res.data)) {
+            tbody.innerHTML = "";
+
+            res.data.forEach((user, index) => {
+                const statusBadge =
+                    user.status === "active"
+                        ? `<span class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded">Active</span>`
+                        : `<span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded">Inactive</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="border px-4 py-3">${index + 1}</td>
+                        <td class="border px-4 py-3">${user.id}</td>
+                        <td class="border px-4 py-3">${user.name}</td>
+                        <td class="border px-4 py-3">${user.email}</td>
+                        <td class="border px-4 py-3">${user.phone}</td>
+                        <td class="border px-4 py-3">${statusBadge}</td>
+                        <td class="border p-2">${user.role}</td>
+                        <td class="border p-2 space-x-1">
+                            <button onclick="viewUser(${user.id})"
+                                class="px-2 py-1 text-xs bg-blue-500 text-white rounded">
+                                View
+                            </button>
+                            <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">
+                                Edit
+                            </button>
+                            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching users:", error);
     }
-
-    const user = result.data;
-
-    document.getElementById("u_id").textContent = user.id;
-    document.getElementById("u_name").textContent = user.name;
-    document.getElementById("u_email").textContent = user.email;
-    document.getElementById("u_phone").textContent = user.phone;
-    document.getElementById("u_status").textContent = user.status;
-    document.getElementById("u_role").textContent = user.role;
-
-    // show modal
-    const modal = document.getElementById("viewUserModal");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-
-  } catch (error) {
-    console.error(error);
-    alert("Server error");
-  }
 }
-
-function closeUserModal() {
-  const modal = document.getElementById("viewUserModal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-}
-
 </script>
+
+ 
 
   <!-- FOOTER -->
  <?php include('footer.php') ?>

@@ -38,7 +38,7 @@
 
     <nav class="p-6 space-y-4 text-gray-700">
       <a href="" class="block px-4 py-2 rounded bg-indigo-600 text-white">Dashboard</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-100">Users</a>
+      <a href="users.php" class="block px-4 py-2 rounded hover:bg-gray-100">Users</a>
       <a href="meals.php" class="block px-4 py-2 rounded hover:bg-gray-100">Meals</a>
       <a href="user_meal.php" class="block px-4 py-2 rounded hover:bg-gray-100">User Meals</a>
       <a href="marketing.php" class="block px-4 py-2 rounded hover:bg-gray-100">marketing</a>
