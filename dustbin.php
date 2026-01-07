@@ -5,12 +5,58 @@
 
   <div class="bg-white shadow rounded-lg overflow-x-auto">
 
+
+<!-- FILTERS -->
+<div class="p-4 bg-gray-50 border-b flex flex-wrap gap-4 items-end">
+
+  <!-- Date Filter -->
+  <div>
+    <label class="text-xs text-gray-600">Filter by Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Day Name Filter -->
+  <div>
+    <label class="text-xs text-gray-600">Filter by Day</label>
+    <select
+      id="filterDay"
+      class="border px-3 py-2 rounded text-sm w-48"
+    >
+      <option value="">All Days</option>
+      <option value="monday">Monday</option>
+      <option value="tuesday">Tuesday</option>
+      <option value="wednesday">Wednesday</option>
+      <option value="thursday">Thursday</option>
+      <option value="friday">Friday</option>
+      <option value="saturday">Saturday</option>
+      <option value="sunday">Sunday</option>
+    </select>
+  </div>
+
+  <!-- Reset Button -->
+  <div>
+    <button
+      onclick="resetFilters()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+
+
     <!-- TABLE -->
     <table class="w-full min-w-[900px] text-sm text-center border-collapse">
       <thead class="bg-gray-200 text-gray-700">
         <tr>
           <th class="border px-4 py-3">SL No</th>
-          <th class="border px-4 py-3">ID</th>
+          <!-- <th class="border px-4 py-3">ID</th> -->
           <th class="border px-4 py-3">User ID</th>
           <th class="border px-4 py-3">Date</th>
           <th class="border px-4 py-3">Day Name</th>
@@ -58,24 +104,35 @@
 <?php include('footer.php') ?>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+const BASE_URL = "<?= BASE_URL ?>";
+const token = localStorage.getItem("auth_token");
 
-  const BASE_URL = "<?= BASE_URL ?>";
-  const token = localStorage.getItem("auth_token");
+if (!token) {
+  alert("Auth token not found. Please login again.");
+}
 
-  if (!token) {
-    alert("Auth token not found. Please login again.");
-    return;
-  }
+/* ==========================
+   FETCH DATA FUNCTION (GLOBAL)
+========================== */
+function fetchDustbinData() {
+
+  const date = document.getElementById("filterDate")?.value || "";
+  const day  = document.getElementById("filterDay")?.value || "";
 
   fetch(`${BASE_URL}/dustbin/fetch_all`, {
-    method: "GET",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`
-    }
+    },
+    body: JSON.stringify({
+      date: date || null,
+      day_name: day || null,
+      limit: 10,
+      offset: 0
+    })
   })
-  .then(response => response.json())
+  .then(res => res.json())
   .then(result => {
 
     if (!result.status) {
@@ -87,40 +144,59 @@ document.addEventListener("DOMContentLoaded", function () {
     tbody.innerHTML = "";
 
     result.data.forEach((item, index) => {
-
       tbody.insertAdjacentHTML("beforeend", `
         <tr class="hover:bg-gray-50">
           <td class="border px-4 py-3">${index + 1}</td>
-          <td class="border px-4 py-3">${item.id}</td>
+         
           <td class="border px-4 py-3">${item.user_id}</td>
           <td class="border px-4 py-3">${item.date}</td>
           <td class="border px-4 py-3 capitalize">${item.day_name}</td>
           <td class="border p-2 space-x-1">
-            <button 
-              onclick="viewDustbin(${item.id})"
+            <button onclick="viewDustbin(${item.id})"
               class="px-2 py-1 text-xs bg-blue-500 text-white rounded">
               View
             </button>
-            <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">
+              Edit
+            </button>
+            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">
+              Delete
+            </button>
           </td>
         </tr>
       `);
     });
-
   })
-  .catch(error => {
-    console.error("API Error:", error);
-    alert("Something went wrong while fetching data.");
+  .catch(err => {
+    console.error(err);
+    alert("API error");
   });
+}
 
+/* ==========================
+   PAGE LOAD & FILTER EVENTS
+========================== */
+document.addEventListener("DOMContentLoaded", function () {
+
+  fetchDustbinData(); // initial load
+
+  document.getElementById("filterDate").addEventListener("change", fetchDustbinData);
+  document.getElementById("filterDay").addEventListener("change", fetchDustbinData);
 });
 
-/* VIEW FUNCTION */
-function viewDustbin(id) {
+/* ==========================
+   RESET FILTERS
+========================== */
+function resetFilters() {
+  document.getElementById("filterDate").value = "";
+  document.getElementById("filterDay").value = "";
+  fetchDustbinData(); // ✅ NOW WORKS
+}
 
-  const BASE_URL = "<?= BASE_URL ?>";
-  const token = localStorage.getItem("auth_token");
+/* ==========================
+   VIEW MODAL
+========================== */
+function viewDustbin(id) {
 
   fetch(`${BASE_URL}/dustbin/fetch/${id}`, {
     method: "GET",

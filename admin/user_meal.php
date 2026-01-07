@@ -17,6 +17,62 @@
 </div>
 
 
+<!-- FILTER SECTION -->
+<div class="p-4 bg-gray-50 border-b flex flex-wrap gap-4 items-end">
+
+  <!-- User Name -->
+  <div>
+    <label class="text-xs text-gray-600">User Name</label>
+    <input
+      type="text"
+      id="filterUserName"
+      placeholder="Search user"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Date -->
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Day -->
+  <!-- <div>
+    <label class="text-xs text-gray-600">Day</label>
+    <select id="filterDay" class="border px-3 py-2 rounded text-sm w-32">
+      <option value="">All</option>
+      <option value="1">Eat</option>
+      <option value="0">Not</option>
+    </select>
+  </div> -->
+
+  <!-- Night -->
+  <!-- <div>
+    <label class="text-xs text-gray-600">Night</label>
+    <select id="filterNight" class="border px-3 py-2 rounded text-sm w-32">
+      <option value="">All</option>
+      <option value="1">Eat</option>
+      <option value="0">Not</option>
+    </select>
+  </div> -->
+
+  <!-- Reset Button -->
+  <div>
+    <button
+      onclick="resetFilters()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
@@ -167,6 +223,30 @@
 
 
 
+<script>
+  document.getElementById("filterUserName").addEventListener("input", autoFilter);
+  document.getElementById("filterDate").addEventListener("change", autoFilter);
+  // document.getElementById("filterDay").addEventListener("change", autoFilter);
+  // document.getElementById("filterNight").addEventListener("change", autoFilter);
+
+  function autoFilter() {
+    offset = 0; // reset pagination
+    fetchUserMeals();
+  }
+</script>
+
+<script>
+  function resetFilters() {
+    document.getElementById("filterUserName").value = "";
+    document.getElementById("filterDate").value = "";
+    // document.getElementById("filterDay").value = "";
+    // document.getElementById("filterNight").value = "";
+
+    offset = 0;
+    fetchUserMeals();
+  }
+</script>
+
 
   <script>
   // 1. Get token from localStorage
@@ -175,15 +255,30 @@
   
 
   // 3. Fetch user meals
+  let limit = 10;
+  let offset = 0;
+
   async function fetchUserMeals() {
-     const BASE_URL = "<?= BASE_URL ?>";
+    const BASE_URL = "<?= BASE_URL ?>";
+
+    const payload = {
+      user_name: document.getElementById("filterUserName").value,
+      date: document.getElementById("filterDate").value,
+      // day: document.getElementById("filterDay").value,
+      // night: document.getElementById("filterNight").value,
+      limit: limit,
+      offset: offset
+    };
+
     try {
       const response = await fetch(`${BASE_URL}/user_meal/fetch_all`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Authorization": `Bearer ${auth_token}`,
-                    "Accept": "application/json"
-        }
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
@@ -194,9 +289,11 @@
         alert("Failed to fetch data");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Fetch Error:", error);
     }
   }
+
+
 
   // 4. Render table rows
   function renderUserMeals(data) {

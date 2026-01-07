@@ -16,12 +16,67 @@
 </div>
 
 
+
+<!-- FILTER SECTION -->
+<div class="p-4 bg-gray-50 border-b flex flex-wrap gap-4 items-end">
+
+  <!-- Min Amount -->
+  <div>
+    <label class="text-xs text-gray-600">Min Amount</label>
+    <input type="number" id="filterMinAmount"
+      class="border px-3 py-2 rounded text-sm w-40"
+      placeholder="Min">
+  </div>
+
+  <!-- Max Amount -->
+  <div>
+    <label class="text-xs text-gray-600">Max Amount</label>
+    <input type="number" id="filterMaxAmount"
+      class="border px-3 py-2 rounded text-sm w-40"
+      placeholder="Max">
+  </div>
+
+  <!-- Date -->
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input type="date" id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-44">
+  </div>
+
+  <!-- Mode -->
+  <div>
+    <label class="text-xs text-gray-600">Mode</label>
+    <select id="filterMode"
+      class="border px-3 py-2 rounded text-sm w-40">
+      <option value="">All</option>
+      <option value="cash">Cash</option>
+      <option value="online">Online</option>
+    </select>
+  </div>
+
+  <!-- Buttons
+  <div class="flex gap-2">
+    <button onclick="applyFilter()"
+      class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+      Apply
+    </button> -->
+
+    <button onclick="resetFilter()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
           <tr>
             <th class="border px-4 py-3">SL No</th>
-            <th class="border px-4 py-3">ID</th>
+            <!-- <th class="border px-4 py-3">ID</th> -->
             <th class="border px-4 py-3">User ID</th>
             <th class="border px-4 py-3">Amount</th>
             <th class="border px-4 py-3">Date</th>
@@ -114,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   fetch(`${BASE_URL}/deposits/fetch_all`, {
-    method: "GET",
+    method: "POST",
     headers: {
       "Accept": "application/json",
       "Authorization": `Bearer ${token}`
@@ -137,7 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const row = `
         <tr class="hover:bg-gray-50">
           <td class="border px-4 py-3">${index + 1}</td>
-          <td class="border px-4 py-3">D${item.id}</td>
+          
           <td class="border px-4 py-3">${item.user_id}</td>
           <td class="border px-4 py-3">₹${item.amount}</td>
           <td class="border px-4 py-3">${item.date}</td>
@@ -276,5 +331,139 @@ function saveDeposit() {
 </script>
 
 
+<script>
+const BASE_URL = "<?= BASE_URL ?>";
+const token = localStorage.getItem("auth_token");
+const tableBody = document.getElementById("depositTableBody");
+
+let currentOffset = 0;
+const limit = 10;
+
+// 🔹 Fetch Deposits (with filters)
+function fetchDeposits(filters = {}) {
+
+  fetch(`${BASE_URL}/deposits/fetch_all`, {
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      filters: filters,
+      pagination: {
+        limit: limit,
+        offset: currentOffset
+      }
+    })
+  })
+  .then(res => res.json())
+  .then(result => {
+
+    if (!result.status) {
+      alert("Failed to fetch deposits");
+      return;
+    }
+
+    tableBody.innerHTML = "";
+
+    result.data.forEach((item, index) => {
+
+      const row = `
+        <tr class="hover:bg-gray-50">
+          <td class="border px-4 py-3">${currentOffset + index + 1}</td>
+          <td class="border px-4 py-3">${item.user_id}</td>
+          <td class="border px-4 py-3">₹${item.amount}</td>
+          <td class="border px-4 py-3">${item.date}</td>
+          <td class="border px-4 py-3 capitalize">${item.mode}</td>
+          <td class="border p-2 space-x-1">
+            <button onclick="viewDeposit(${item.id})"
+              class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+            <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+          </td>
+        </tr>
+      `;
+
+      tableBody.insertAdjacentHTML("beforeend", row);
+    });
+
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Something went wrong");
+  });
+}
+
+// 🔹 Initial Load
+document.addEventListener("DOMContentLoaded", () => {
+  fetchDeposits();
+});
+</script>
+
+
+
+
+<script>
+function applyFilter() {
+
+  const filters = {
+    min_amount: document.getElementById("filterMinAmount").value || null,
+    max_amount: document.getElementById("filterMaxAmount").value || null,
+    date: document.getElementById("filterDate").value || null,
+    mode: document.getElementById("filterMode").value || null
+  };
+
+  currentOffset = 0;
+  fetchDeposits(filters);
+}
+
+function resetFilter() {
+
+  document.getElementById("filterMinAmount").value = "";
+  document.getElementById("filterMaxAmount").value = "";
+  document.getElementById("filterDate").value = "";
+  document.getElementById("filterMode").value = "";
+
+  currentOffset = 0;
+  fetchDeposits();
+}
+</script>
+
+
+<script>
+function getFilters() {
+  return {
+    min_amount: document.getElementById("filterMinAmount").value || null,
+    max_amount: document.getElementById("filterMaxAmount").value || null,
+    date: document.getElementById("filterDate").value || null,
+    mode: document.getElementById("filterMode").value || null
+  };
+}
+
+// 🔹 Auto fetch on change / input
+["filterMinAmount", "filterMaxAmount", "filterDate", "filterMode"].forEach(id => {
+  document.getElementById(id).addEventListener("input", () => {
+    currentOffset = 0;
+    fetchDeposits(getFilters());
+  });
+});
+
+// 🔹 Reset button logic
+function resetFilter() {
+
+  document.getElementById("filterMinAmount").value = "";
+  document.getElementById("filterMaxAmount").value = "";
+  document.getElementById("filterDate").value = "";
+  document.getElementById("filterMode").value = "";
+
+  currentOffset = 0;
+  fetchDeposits();
+}
+</script>
+
+
+
 
   <?php include('footer.php') ?>
+

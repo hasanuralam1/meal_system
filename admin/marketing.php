@@ -16,6 +16,76 @@
 
 
 
+
+
+<!-- FILTER SECTION -->
+<div class="bg-white p-4 mb-4 rounded shadow flex flex-wrap gap-4 items-end">
+
+  <!-- User Name -->
+  <div>
+    <label class="text-xs text-gray-600">User Name</label>
+    <input
+      type="text"
+      id="filterUser"
+      placeholder="User name"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Market -->
+  <div>
+    <label class="text-xs text-gray-600">Market</label>
+    <input
+      type="text"
+      id="filterMarket"
+      placeholder="Market"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Price Min -->
+  <div>
+    <label class="text-xs text-gray-600">Min Price</label>
+    <input
+      type="number"
+      id="filterPriceMin"
+      class="border px-3 py-2 rounded text-sm w-32"
+    />
+  </div>
+
+  <!-- Price Max -->
+  <div>
+    <label class="text-xs text-gray-600">Max Price</label>
+    <input
+      type="number"
+      id="filterPriceMax"
+      class="border px-3 py-2 rounded text-sm w-32"
+    />
+  </div>
+
+  <!-- Date -->
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-44"
+    />
+  </div>
+
+  <!-- Reset Button -->
+  <div>
+    <button
+      onclick="resetFilters()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
@@ -169,33 +239,56 @@
   </main>
 
 
-  <script>
+ <script>
 document.addEventListener("DOMContentLoaded", function () {
+    fetchMarketing(); // initial load
 
-    const BASE_URL = "<?= BASE_URL ?>";// e.g. https://example.com/api
+    // Auto filter (no apply button)
+    ["filterUser", "filterMarket", "filterPriceMin", "filterPriceMax", "filterDate"]
+    .forEach(id => {
+        document.getElementById(id).addEventListener("input", () => {
+            fetchMarketing();
+        });
+    });
+});
+
+function fetchMarketing(offset = 0) {
+
+    const BASE_URL = "<?= BASE_URL ?>";
     const authToken = localStorage.getItem("auth_token");
     const tableBody = document.getElementById("marketingTableBody");
 
     if (!authToken) {
         tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="py-4 text-red-500">
-                    Authentication token missing. Please login again.
-                </td>
-            </tr>`;
+            <tr><td colspan="7" class="py-4 text-red-500">
+                Authentication token missing
+            </td></tr>`;
         return;
     }
 
-    fetch(`${BASE_URL}/marketing/fetch_all`, {
-    method: "GET",
-    headers: {
-        "Authorization": `Bearer ${authToken}`,
-        "Accept": "application/json"
-    }
-})
+    const bodyData = {
+        user_name: document.getElementById("filterUser").value,
+        market: document.getElementById("filterMarket").value,
+        price_min: document.getElementById("filterPriceMin").value,
+        price_max: document.getElementById("filterPriceMax").value,
+        date: document.getElementById("filterDate").value,
+        limit: 10,
+        offset: offset
+    };
 
-    .then(response => response.json())
+    fetch(`${BASE_URL}/marketing/fetch_all`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(bodyData)
+    })
+    .then(res => res.json())
     .then(result => {
+
+        tableBody.innerHTML = "";
 
         if (!result.status || result.data.length === 0) {
             tableBody.innerHTML = `
@@ -207,51 +300,49 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        tableBody.innerHTML = "";
-
         result.data.forEach((item, index) => {
             tableBody.innerHTML += `
-                <tr class="hover:bg-gray-50">
-                    <td class="border px-4 py-3">${index + 1}</td>
-                    <td class="border px-4 py-3">MK${item.id}</td>
-                    <td class="border px-4 py-3">${item.user_id}</td>
-                    <td class="border px-4 py-3">${item.market}</td>
-                    <td class="border px-4 py-3">₹${item.price}</td>
-                    <td class="border px-4 py-3">${item.date}</td>
-                    <td class="border p-2 space-x-1">
-                        <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
-  onclick="viewMarketing(${item.id})">
-  View
-</button>
+            <tr class="hover:bg-gray-50">
+                <td class="border px-4 py-3">${offset + index + 1}</td>
+                <td class="border px-4 py-3">MK${item.id}</td>
+                <td class="border px-4 py-3">${item.user.id}</td>
+                <td class="border px-4 py-3">${item.market}</td>
+                <td class="border px-4 py-3">₹${item.price}</td>
+                <td class="border px-4 py-3">${item.date}</td>
+                <td class="border p-2 space-x-1">
+                    <button class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
+                        onclick="viewMarketing(${item.id})">View</button>
 
-                       <button
-  class="px-2 py-1 text-xs bg-yellow-500 text-white rounded"
-  onclick="openEditMarketing(${item.id}, '${item.market}', '${item.price}', '${item.date}', '${item.user_id}')">
-  Edit
-</button>
-<button
-  class="px-2 py-1 text-xs bg-red-500 text-white rounded"
-  onclick="deleteMarketing(${item.id})">
-  Delete
-</button>
+                    <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded"
+                        onclick="openEditMarketing(${item.id}, '${item.market}', '${item.price}', '${item.date}', '${item.user_id}')">Edit</button>
 
-                    </td>
-                </tr>
-            `;
-        });
-    })
-    .catch(error => {
-        console.error(error);
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="py-4 text-red-500">
-                    Failed to load marketing data
+                    <button class="px-2 py-1 text-xs bg-red-500 text-white rounded"
+                        onclick="deleteMarketing(${item.id})">Delete</button>
                 </td>
             </tr>`;
+        });
+    })
+    .catch(() => {
+        tableBody.innerHTML = `
+            <tr><td colspan="7" class="py-4 text-red-500">
+                Failed to load data
+            </td></tr>`;
     });
-
-})
+}
 </script>
+
+
+<script>
+function resetFilters() {
+    document.getElementById("filterUser").value = "";
+    document.getElementById("filterMarket").value = "";
+    document.getElementById("filterPriceMin").value = "";
+    document.getElementById("filterPriceMax").value = "";
+    document.getElementById("filterDate").value = "";
+    fetchMarketing();
+}
+</script>
+
 
 <script>
 const addModal = document.getElementById("addMarketingModal");

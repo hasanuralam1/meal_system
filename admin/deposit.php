@@ -12,12 +12,63 @@
 
 
 
+
+
+
+<!-- FILTER SECTION -->
+<div class="p-4 bg-gray-50 border rounded mb-4 flex flex-wrap gap-4 items-end">
+
+  <div>
+    <label class="text-xs text-gray-600">User Name</label>
+    <input type="text" id="filterName"
+           class="border px-3 py-2 rounded text-sm w-40"
+           placeholder="Search name">
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Min Amount</label>
+    <input type="number" id="filterMinAmount"
+           class="border px-3 py-2 rounded text-sm w-32">
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Max Amount</label>
+    <input type="number" id="filterMaxAmount"
+           class="border px-3 py-2 rounded text-sm w-32">
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input type="date" id="filterDate"
+           class="border px-3 py-2 rounded text-sm w-40">
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Mode</label>
+    <select id="filterMode"
+            class="border px-3 py-2 rounded text-sm w-32">
+      <option value="">All</option>
+      <option value="cash">Cash</option>
+      <option value="online">Online</option>
+    </select>
+  </div>
+
+  <div>
+    <button onclick="resetFilters()"
+            class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
           <tr>
             <th class="border px-4 py-3">SL No</th>
-            <th class="border px-4 py-3">ID</th>
+            
             <th class="border px-4 py-3">User ID</th>
             <th class="border px-4 py-3">Amount</th>
             <th class="border px-4 py-3">Date</th>
@@ -42,7 +93,7 @@
     <h2 class="text-lg font-semibold mb-4">Deposit Details</h2>
 
     <div class="space-y-2 text-sm">
-      <p><strong>ID:</strong> <span id="v_id"></span></p>
+      
       <p><strong>User Name:</strong> <span id="v_name"></span></p>
       <p><strong>Email:</strong> <span id="v_email"></span></p>
       <p><strong>Phone:</strong> <span id="v_phone"></span></p>
@@ -70,7 +121,7 @@
     <h2 class="text-lg font-semibold mb-4">Edit Deposit</h2>
 
     <!-- Hidden ID -->
-    <input type="hidden" id="e_id">
+    <!-- <input type="hidden" id="e_id"> -->
 
     <div class="space-y-3 text-sm">
       <input type="number" id="e_user_id"
@@ -167,61 +218,102 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  fetch(`${BASE_URL}/deposits/fetch_all`, {
-    method: "GET",
-    headers: {
-      "Accept": "application/json",
-      "Authorization": `Bearer ${token}`
-    }
-  })
-  .then(res => res.json())
-  .then(result => {
+  // 🔹 Filter inputs
+  const filterName = document.getElementById("filterName");
+  const filterMinAmount = document.getElementById("filterMinAmount");
+  const filterMaxAmount = document.getElementById("filterMaxAmount");
+  const filterDate = document.getElementById("filterDate");
+  const filterMode = document.getElementById("filterMode");
 
-    if (!result.status) {
-      alert("Failed to load deposits");
-      return;
-    }
+  // 🔹 Fetch deposits
+  function fetchDeposits() {
 
-    tableBody.innerHTML = "";
+    const bodyData = {
+      filters: {
+        name: filterName.value,
+        min_amount: filterMinAmount.value,
+        max_amount: filterMaxAmount.value,
+        date: filterDate.value,
+        mode: filterMode.value
+      },
+      pagination: {
+        limit: 10,
+        offset: 0
+      }
+    };
 
-    result.data.forEach((item, index) => {
+    fetch(`${BASE_URL}/deposits/fetch_all`, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(bodyData)
+    })
+    .then(res => res.json())
+    .then(result => {
 
-      const row = `
-        <tr class="hover:bg-gray-50">
-          <td class="border px-4 py-3">${index + 1}</td>
-          <td class="border px-4 py-3">D${item.id}</td>
-          <td class="border px-4 py-3">${item.user_id}</td>
-          <td class="border px-4 py-3">₹${item.amount}</td>
-          <td class="border px-4 py-3">${item.date}</td>
-          <td class="border px-4 py-3 capitalize">${item.mode}</td>
-          <td class="border p-2 space-x-1">
-            <button onclick="viewDeposit(${item.id})"
-              class="px-2 py-1 text-xs bg-blue-500 text-white rounded">
-              View
-            </button>
-           <button onclick="openEditDeposit(${item.id})"
-              class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">
-              Edit
-           </button>
-           <button onclick="deleteDeposit(${item.id})"
-             class="px-2 py-1 text-xs bg-red-500 text-white rounded">
-             Delete
-           </button>
+      tableBody.innerHTML = "";
 
-          </td>
-        </tr>
-      `;
+      if (!result.status || result.data.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="border py-4 text-gray-500">
+              No data found
+            </td>
+          </tr>`;
+        return;
+      }
 
-      tableBody.insertAdjacentHTML("beforeend", row);
+      result.data.forEach((item, index) => {
+
+        const row = `
+          <tr class="hover:bg-gray-50">
+            <td class="border px-4 py-3">${index + 1}</td>
+            <td class="border px-4 py-3">${item.user_id}</td>
+            <td class="border px-4 py-3">₹${item.amount}</td>
+            <td class="border px-4 py-3">${item.date}</td>
+            <td class="border px-4 py-3 capitalize">${item.mode}</td>
+            <td class="border p-2 space-x-1">
+              <button onclick="viewDeposit(${item.id})"
+                class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+              <button onclick="openEditDeposit(${item.id})"
+                class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+              <button onclick="deleteDeposit(${item.id})"
+                class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+            </td>
+          </tr>
+        `;
+        tableBody.insertAdjacentHTML("beforeend", row);
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Something went wrong");
     });
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Something went wrong");
-  });
+  }
+
+  // 🔹 Auto apply filters
+  [filterName, filterMinAmount, filterMaxAmount, filterDate, filterMode]
+    .forEach(input => input.addEventListener("input", fetchDeposits));
+
+  // 🔹 Initial load
+  fetchDeposits();
+
+  // 🔹 Reset filters
+  window.resetFilters = function () {
+    filterName.value = "";
+    filterMinAmount.value = "";
+    filterMaxAmount.value = "";
+    filterDate.value = "";
+    filterMode.value = "";
+    fetchDeposits();
+  };
 
 });
 </script>
+
 <script>
 function viewDeposit(id) {
 
@@ -250,7 +342,7 @@ function viewDeposit(id) {
 
     const data = result.data;
 
-    document.getElementById("v_id").innerText = data.id;
+    // document.getElementById("v_id").innerText = data.id;
     document.getElementById("v_name").innerText = data.user.name;
     document.getElementById("v_email").innerText = data.user.email;
     document.getElementById("v_phone").innerText = data.user.phone;
@@ -296,7 +388,7 @@ function openEditDeposit(id) {
 
     const data = result.data;
 
-    document.getElementById("e_id").value = data.id;
+    // document.getElementById("e_id").value = data.id;
     document.getElementById("e_user_id").value = data.user_id;
     document.getElementById("e_amount").value = data.amount;
     document.getElementById("e_date").value = data.date;
@@ -321,7 +413,7 @@ function updateDeposit() {
   const BASE_URL = "<?= BASE_URL ?>";
   const token = localStorage.getItem("auth_token");
 
-  const id = document.getElementById("e_id").value;
+  // const id = document.getElementById("e_id").value;
   const user_id = document.getElementById("e_user_id").value;
   const amount = document.getElementById("e_amount").value;
   const date = document.getElementById("e_date").value;

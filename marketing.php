@@ -16,12 +16,67 @@
 
 
 
+
+<!-- FILTER SECTION -->
+<div class="bg-white p-4 rounded shadow mb-4 flex flex-wrap gap-4 items-end">
+
+  <div>
+    <label class="text-xs text-gray-600">Market</label>
+    <input
+      type="text"
+      id="filterMarket"
+      placeholder="Market name"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Min Price</label>
+    <input
+      type="number"
+      id="filterPriceMin"
+      class="border px-3 py-2 rounded text-sm w-32"
+    />
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Max Price</label>
+    <input
+      type="number"
+      id="filterPriceMax"
+      class="border px-3 py-2 rounded text-sm w-32"
+    />
+  </div>
+
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-40"
+    />
+  </div>
+
+  <!-- ONLY RESET BUTTON -->
+  <div>
+    <button
+      onclick="resetFilters()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+
+
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
           <tr>
             <th class="border px-4 py-3">SL No</th>
-            <th class="border px-4 py-3">ID</th>
+            <!-- <th class="border px-4 py-3">ID</th> -->
             <th class="border px-4 py-3">User ID</th>
             <th class="border px-4 py-3">Market</th>
             <th class="border px-4 py-3">Price</th>
@@ -96,7 +151,7 @@
     <h2 class="text-lg font-semibold mb-4">Marketing Details</h2>
 
     <div class="space-y-2 text-sm">
-      <p><strong>ID:</strong> <span id="v_id"></span></p>
+      <!-- <p><strong>ID:</strong> <span id="v_id"></span></p> -->
       <p><strong>User:</strong> <span id="v_user"></span></p>
       <p><strong>Market:</strong> <span id="v_market"></span></p>
       <p><strong>Price:</strong> ₹<span id="v_price"></span></p>
@@ -186,15 +241,30 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    fetch(`${BASE_URL}/marketing/fetch_all`, {
-    method: "GET",
-    headers: {
-        "Authorization": `Bearer ${authToken}`,
-        "Accept": "application/json"
-    }
-})
+    let limit = 10;
+let offset = 0;
 
-    .then(response => response.json())
+function fetchMarketing() {
+
+    const payload = {
+        market: document.getElementById("filterMarket").value || null,
+        price_min: document.getElementById("filterPriceMin").value || null,
+        price_max: document.getElementById("filterPriceMax").value || null,
+        date: document.getElementById("filterDate").value || null,
+        limit: limit,
+        offset: offset
+    };
+
+    fetch(`${BASE_URL}/marketing/fetch_all`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${authToken}`,
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
     .then(result => {
 
         if (!result.status || result.data.length === 0) {
@@ -211,43 +281,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
         result.data.forEach((item, index) => {
             tableBody.innerHTML += `
-                <tr class="hover:bg-gray-50">
-                    <td class="border px-4 py-3">${index + 1}</td>
-                    <td class="border px-4 py-3">MK${item.id}</td>
+                <tr>
+                    <td class="border px-4 py-3">${offset + index + 1}</td>
                     <td class="border px-4 py-3">${item.user_id}</td>
                     <td class="border px-4 py-3">${item.market}</td>
                     <td class="border px-4 py-3">₹${item.price}</td>
                     <td class="border px-4 py-3">${item.date}</td>
+                    
                     <td class="border p-2 space-x-1">
-                        <button
-  class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
-  onclick="viewMarketing(${item.id})">
-  View
-</button>
+    <button
+      class="px-2 py-1 text-xs bg-blue-500 text-white rounded"
+      onclick="viewMarketing(${item.id})">
+      View
+    </button>
 
-                       <button
-  class="px-2 py-1 text-xs bg-yellow-500 text-white rounded"
-  onclick="openEditMarketing(${item.id}, '${item.market}', '${item.price}', '${item.date}', '${item.user_id}')">
-  Edit
-</button>
+    <button
+      class="px-2 py-1 text-xs bg-yellow-500 text-white rounded"
+      onclick="openEditMarketing(
+        ${item.id},
+        '${item.market}',
+        '${item.price}',
+        '${item.date}',
+        '${item.user_id}'
+      )">
+      Edit
+    </button>
 
-                        <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">
-                            Delete
-                        </button>
-                    </td>
+    <button
+      class="px-2 py-1 text-xs bg-red-500 text-white rounded"
+      onclick="deleteMarketing(${item.id})">
+      Delete
+    </button>
+</td>
+
                 </tr>
             `;
         });
-    })
-    .catch(error => {
-        console.error(error);
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="py-4 text-red-500">
-                    Failed to load marketing data
-                </td>
-            </tr>`;
     });
+}
+
+// AUTO FETCH ON CHANGE
+["filterMarket","filterPriceMin","filterPriceMax","filterDate"]
+.forEach(id => {
+    document.getElementById(id).addEventListener("input", () => {
+        offset = 0;
+        fetchMarketing();
+    });
+});
+
+// RESET
+window.resetFilters = function () {
+    document.getElementById("filterMarket").value = "";
+    document.getElementById("filterPriceMin").value = "";
+    document.getElementById("filterPriceMax").value = "";
+    document.getElementById("filterDate").value = "";
+    offset = 0;
+    fetchMarketing();
+};
+
+// INITIAL LOAD
+fetchMarketing();
+
 
 })
 </script>
@@ -343,7 +437,7 @@ function viewMarketing(id) {
 
         const data = result.data;
 
-        document.getElementById("v_id").innerText = data.id;
+        // document.getElementById("v_id").innerText = data.id;
         document.getElementById("v_user").innerText = data.user.name;
         document.getElementById("v_market").innerText = data.market;
         document.getElementById("v_price").innerText = data.price;
@@ -434,3 +528,5 @@ document.getElementById("editMarketingForm").addEventListener("submit", function
 
 
  <?php include('footer.php') ?>
+
+

@@ -8,14 +8,49 @@
     <div class="bg-white shadow rounded-lg overflow-x-auto">
 
 
-   
+   <!-- FILTER SECTION -->
+<div class="p-4 bg-gray-50 border-b flex flex-wrap gap-4 items-end">
+
+  <!-- Date Filter -->
+  <div>
+    <label class="text-xs text-gray-600">Filter by Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Filter Button -->
+  <!-- <div>
+    <button
+      onclick="applyFilter()"
+      class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+      Apply
+    </button>
+  </div> -->
+
+  <!-- Reset Button -->
+  <div>
+    <button
+      onclick="resetFilter()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+
+
 
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
           <tr>
             <th class="border px-4 py-3">SL No</th>
-            <th class="border px-4 py-3">ID</th>
+            <!-- <th class="border px-4 py-3">ID</th> -->
             <th class="border px-4 py-3">User ID</th>
             <th class="border px-4 py-3">user name</th>
             <th class="border px-4 py-3">Date</th>
@@ -73,19 +108,31 @@
   <script>
   // 1. Get token from localStorage
   const auth_token = localStorage.getItem("auth_token");
+  const BASE_URL = "<?= BASE_URL ?>";
 
-  
+  let currentOffset = 0;
+  const limit = 10;
 
-  // 3. Fetch user meals
-  async function fetchUserMeals() {
-     const BASE_URL = "<?= BASE_URL ?>";
+  async function fetchUserMeals(filterDate = null) {
     try {
+      const payload = {
+        limit: limit,
+        offset: currentOffset
+      };
+
+      // Add filter ONLY if passed
+      if (filterDate) {
+        payload.date = filterDate;
+      }
+
       const response = await fetch(`${BASE_URL}/user_meal/fetch_all`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Authorization": `Bearer ${auth_token}`,
-                    "Accept": "application/json"
-        }
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       });
 
       const result = await response.json();
@@ -100,6 +147,17 @@
     }
   }
 
+  // function applyFilter() {
+  //   const date = document.getElementById("filterDate").value;
+  //   currentOffset = 0;
+  //   fetchUserMeals(date);
+  // }
+
+  function resetFilter() {
+    document.getElementById("filterDate").value = "";
+    currentOffset = 0;
+    fetchUserMeals();
+  }
   // 4. Render table rows
   function renderUserMeals(data) {
     const tbody = document.getElementById("userMealTableBody");
@@ -109,7 +167,7 @@
       const row = `
         <tr class="hover:bg-gray-50">
           <td class="border px-4 py-3">${index + 1}</td>
-          <td class="border px-4 py-3">${item.id}</td>
+         
           <td class="border px-4 py-3">${item.user_id}</td>
           <td class="border px-4 py-3">${item.user_name}</td>
           <td class="border px-4 py-3">${item.date}</td>
@@ -137,7 +195,7 @@
 
 
 <script>
-  const BASE_URL = "<?= BASE_URL ?>";
+  
 
   // Open modal
   function openViewModal() {
@@ -186,6 +244,15 @@
   }
 </script>
 
+
+
+<script>
+  // Auto apply filter when date changes
+  document.getElementById("filterDate").addEventListener("change", function () {
+    currentOffset = 0;
+    fetchUserMeals(this.value);
+  });
+</script>
 
 
 

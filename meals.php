@@ -16,12 +16,73 @@
 </div>
 
 
+
+<!-- FILTER SECTION -->
+<div class="p-4 bg-gray-50 border-b flex flex-wrap gap-4 items-end">
+
+  <!-- Meal Name -->
+  <div>
+    <label class="text-xs text-gray-600">Meal Name</label>
+    <input
+      type="text"
+      id="filterMealName"
+      placeholder="Search meal"
+      class="border px-3 py-2 rounded text-sm w-40"
+    />
+  </div>
+
+  <!-- Date -->
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-40"
+    />
+  </div>
+
+  <!-- Day Name -->
+  <div>
+    <label class="text-xs text-gray-600">Day Name</label>
+    <select
+      id="filterDayName"
+      class="border px-3 py-2 rounded text-sm w-40"
+    >
+      <option value="">All</option>
+      <option value="sunday">Sunday</option>
+      <option value="monday">Monday</option>
+      <option value="tuesday">Tuesday</option>
+      <option value="wednesday">Wednesday</option>
+      <option value="thursday">Thursday</option>
+      <option value="friday">Friday</option>
+      <option value="saturday">Saturday</option>
+    </select>
+  </div>
+
+  <!-- Buttons -->
+  <div class="flex gap-2">
+    <!-- <button
+      onclick="applyMealFilter()"
+      class="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+      Apply
+    </button> -->
+
+    <button
+      onclick="resetMealFilter()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
       <!-- TABLE -->
       <table class="w-full min-w-[900px] text-sm text-center border-collapse">
         <thead class="bg-gray-200 text-gray-700">
           <tr>
             <th class="border px-4 py-3">SL No</th>
-            <th class="border px-4 py-3">ID</th>
+            <!-- <th class="border px-4 py-3">ID</th> -->
             <th class="border px-4 py-3">Meal Name</th>
             <th class="bborder px-4 py-3">Date</th>
             <th class="border px-4 py-3">Day</th>
@@ -47,7 +108,7 @@
     <h3 class="text-lg font-semibold mb-4">Meal Details</h3>
 
     <div class="space-y-2 text-sm">
-      <p><strong>ID:</strong> <span id="v_id"></span></p>
+      <!-- <p><strong>ID:</strong> <span id="v_id"></span></p> -->
       <p><strong>Meal Name:</strong> <span id="v_meal_name"></span></p>
       <p><strong>Date:</strong> <span id="v_date"></span></p>
       <p><strong>Day:</strong> <span id="v_day"></span></p>
@@ -104,24 +165,11 @@
 
     </div>
 
-    <!-- <div class="flex justify-end gap-2 mt-4">
-      <button onclick="closeAddMealModal()"
-        class="px-4 py-2 border rounded">Cancel</button>
-
-      <button onclick="createMeal()"
-        class="px-4 py-2 bg-green-600 text-white rounded">
-        Save
-      </button>
-    </div>
-
-    <button onclick="closeAddMealModal()"
-      class="absolute top-2 right-2 text-gray-500 hover:text-black">✕</button>
-
-  </div>
-</div> -->
+   
 
 
   <script>
+    
     document.addEventListener("DOMContentLoaded", fetchMeals);
     async function viewMeal(mealId) {
     const token = localStorage.getItem("auth_token");
@@ -151,7 +199,7 @@
         const meal = result.data;
 
         // Fill modal
-        document.getElementById("v_id").textContent = meal.id;
+        // document.getElementById("v_id").textContent = meal.id;
         document.getElementById("v_meal_name").textContent = meal.meal_name;
         document.getElementById("v_date").textContent = meal.date;
         document.getElementById("v_day").textContent = meal.day;
@@ -174,69 +222,126 @@ function closeMealModal() {
     modal.classList.remove("flex");
 }
     const BASE_URL = "<?= BASE_URL ?>";
+    let currentOffset = 0;
+    const limit = 5;
 
-    async function fetchMeals() {
-        const token = localStorage.getItem("auth_token");
-        const tbody = document.getElementById("mealTableBody");
+   
+async function fetchMeals() {
+    const token = localStorage.getItem("auth_token");
+    const tbody = document.getElementById("mealTableBody");
 
-        if (!token) {
+    if (!token) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="py-6 text-red-500">Unauthorized</td>
+            </tr>`;
+        return;
+    }
+
+    const payload = {
+        meal_name: document.getElementById("filterMealName")?.value || "",
+        date: document.getElementById("filterDate")?.value || "",
+        day_name: document.getElementById("filterDayName")?.value || "",
+        limit: limit,
+        offset: currentOffset
+    };
+
+    try {
+        const res = await fetch(`${BASE_URL}/meals/fetch_all`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        console.log("MEALS FILTER RESPONSE:", result);
+
+        if (!result.status || !result.data.length) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="8" class="py-6 text-red-500">Unauthorized</td>
+                    <td colspan="8" class="py-6 text-gray-500">No meals found</td>
                 </tr>`;
             return;
         }
 
-        try {
-            const res = await fetch(`${BASE_URL}/meals/fetch_all`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Accept": "application/json"
-                }
-            });
+        tbody.innerHTML = "";
 
-            const result = await res.json();
-            console.log("MEALS API RESPONSE:", result);
+        result.data.forEach((meal, index) => {
+            tbody.innerHTML += `
+                <tr class="hover:bg-gray-50">
+                    <td class="border px-4 py-3">${currentOffset + index + 1}</td>
+                    <td class="border px-4 py-3">${meal.meal_name}</td>
+                    <td class="border px-4 py-3">${meal.date}</td>
+                    <td class="border px-4 py-3">${meal.day}</td>
+                    <td class="border px-4 py-3">${meal.night}</td>
+                    <td class="border px-4 py-3">${meal.day_name}</td>
+                    <td class="border p-2 space-x-1">
+                        <button onclick="viewMeal(${meal.id})"
+                          class="px-2 py-1 text-xs bg-blue-500 text-white rounded">View</button>
+                        <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
+                        <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
 
-            if (!result.status || !result.data.length) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="8" class="py-6 text-gray-500">No meals found</td>
-                    </tr>`;
-                return;
-            }
-
-            tbody.innerHTML = "";
-
-            result.data.forEach((meal, index) => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="border px-4 py-3">${index + 1}</td>
-                        <td class="border px-4 py-3">${meal.id}</td>
-                        <td class="border px-4 py-3">${meal.meal_name}</td>
-                        <td class="border px-4 py-3">${meal.date}</td>
-                        <td class="border px-4 py-3">${meal.day}</td>
-                        <td class="border px-4 py-3">${meal.night}</td>
-                        <td class="border px-4 py-3">${meal.day_name}</td>
-                        <td class="border p-2 space-x-1">
-                          <button onclick="viewMeal(${meal.id})" class="px-2 py-1 text-xs bg-blue-500 text-white rounded"> View</button>
-                            <button class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">Edit</button>
-                            <button class="px-2 py-1 text-xs bg-red-500 text-white rounded">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-        } catch (error) {
-            console.error(error);
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="py-6 text-red-500">Server error</td>
-                </tr>`;
-        }
+    } catch (error) {
+        console.error(error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="py-6 text-red-500">Server error</td>
+            </tr>`;
     }
-  </script>
+}
+</script>
+
+
+<script>
+let filterTimeout = null;
+
+// Meal name auto-search (typing)
+document.getElementById("filterMealName").addEventListener("input", function () {
+    clearTimeout(filterTimeout);
+    filterTimeout = setTimeout(() => {
+        currentOffset = 0;
+        fetchMeals();
+    }, 400);
+});
+
+// Date auto-filter
+document.getElementById("filterDate").addEventListener("change", function () {
+    currentOffset = 0;
+    fetchMeals();
+});
+
+// Day name auto-filter
+document.getElementById("filterDayName").addEventListener("change", function () {
+    currentOffset = 0;
+    fetchMeals();
+});
+</script>
+
+
+
+<script>
+function applyMealFilter() {
+    currentOffset = 0;
+    fetchMeals();
+}
+
+function resetMealFilter() {
+    document.getElementById("filterMealName").value = "";
+    document.getElementById("filterDate").value = "";
+    document.getElementById("filterDayName").value = "";
+    currentOffset = 0;
+    fetchMeals();
+}
+</script>
+
 
 
 <script>
@@ -308,3 +413,5 @@ document.getElementById("a_date").addEventListener("change", function () {
   
   <!-- FOOTER -->
  <?php include('footer.php') ?>
+
+

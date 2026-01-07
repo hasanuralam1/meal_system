@@ -15,6 +15,63 @@
 </div>
 
 
+<!-- FILTER SECTION -->
+<div class="p-4 bg-gray-50 border-b flex flex-wrap gap-4 items-end">
+
+  <!-- User Name -->
+  <div>
+    <label class="text-xs text-gray-600">User Name</label>
+    <input
+      type="text"
+      id="filterUser"
+      placeholder="Search user"
+      class="border px-3 py-2 rounded text-sm w-48"
+    />
+  </div>
+
+  <!-- Date -->
+  <div>
+    <label class="text-xs text-gray-600">Date</label>
+    <input
+      type="date"
+      id="filterDate"
+      class="border px-3 py-2 rounded text-sm w-40"
+    />
+  </div>
+
+  <!-- Day Name -->
+  <div>
+    <label class="text-xs text-gray-600">Day</label>
+    <select
+      id="filterDay"
+      class="border px-3 py-2 rounded text-sm w-40"
+    >
+      <option value="">All</option>
+      <option value="monday">Monday</option>
+      <option value="tuesday">Tuesday</option>
+      <option value="wednesday">Wednesday</option>
+      <option value="thursday">Thursday</option>
+      <option value="friday">Friday</option>
+      <option value="saturday">Saturday</option>
+      <option value="sunday">Sunday</option>
+    </select>
+  </div>
+
+  <!-- Reset -->
+  <div>
+    <button
+      onclick="resetFilters()"
+      class="px-4 py-2 bg-gray-600 text-white rounded text-sm">
+      Reset
+    </button>
+  </div>
+
+</div>
+
+
+
+
+
     <!-- TABLE -->
     <table class="w-full min-w-[900px] text-sm text-center border-collapse">
       <thead class="bg-gray-200 text-gray-700">
@@ -158,68 +215,103 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   const BASE_URL = "<?= BASE_URL ?>";
-  const token = localStorage.getItem("auth_token");
+  const auth_token = localStorage.getItem("auth_token");
 
-  if (!token) {
-    alert("Auth token not found. Please login again.");
+  if (!auth_token) {
+    alert("Auth token not found");
     return;
   }
 
-  fetch(`${BASE_URL}/dustbin/fetch_all`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    }
-  })
-  .then(response => response.json())
-  .then(result => {
+  // Initial load
+  fetchDustbin();
 
-    if (!result.status) {
-      alert("Failed to fetch data");
-      return;
-    }
+  // Auto filter on input change
+  document.getElementById("filterUser").addEventListener("input", debounce(fetchDustbin, 400));
+  document.getElementById("filterDate").addEventListener("change", fetchDustbin);
+  document.getElementById("filterDay").addEventListener("change", fetchDustbin);
 
-    const tbody = document.getElementById("dustbinTableBody");
-    tbody.innerHTML = "";
+  function fetchDustbin() {
 
-    result.data.forEach((item, index) => {
+    const payload = {
+      user_name: document.getElementById("filterUser").value,
+      date: document.getElementById("filterDate").value,
+      day_name: document.getElementById("filterDay").value,
+      limit: 10,
+      offset: 0
+    };
 
-      tbody.insertAdjacentHTML("beforeend", `
-        <tr class="hover:bg-gray-50">
-          <td class="border px-4 py-3">${index + 1}</td>
-          <td class="border px-4 py-3">${item.id}</td>
-          <td class="border px-4 py-3">${item.user_id}</td>
-          <td class="border px-4 py-3">${item.date}</td>
-          <td class="border px-4 py-3 capitalize">${item.day_name}</td>
-          <td class="border p-2 space-x-1">
-            <button 
-              onclick="viewDustbin(${item.id})"
-              class="px-2 py-1 text-xs bg-blue-500 text-white rounded">
-              View
-            </button>
-           <button onclick="openEditModal(${item.id}, '${item.user_id}', '${item.date}', '${item.day_name}')"
-             class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">
-              Edit
-           </button>
+    fetch(`${BASE_URL}/dustbin/fetch_all`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${auth_token}`
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(result => {
 
-            <button  onclick="deleteDustbin(${item.id})"
-              class="px-2 py-1 text-xs bg-red-500 text-white rounded">
-              Delete
-            </button>
+      const tbody = document.getElementById("dustbinTableBody");
+      tbody.innerHTML = "";
 
-          </td>
-        </tr>
-      `);
+      if (!result.status || result.data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="border py-4 text-gray-500">
+              No records found
+            </td>
+          </tr>`;
+        return;
+      }
+
+      result.data.forEach((item, index) => {
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr class="hover:bg-gray-50">
+            <td class="border px-4 py-3">${index + 1}</td>
+            <td class="border px-4 py-3">${item.id}</td>
+            <td class="border px-4 py-3">${item.user_id}</td>
+            <td class="border px-4 py-3">${item.date}</td>
+            <td class="border px-4 py-3 capitalize">${item.day_name}</td>
+            <td class="border p-2 space-x-1">
+              <button onclick="viewDustbin(${item.id})"
+                class="px-2 py-1 text-xs bg-blue-500 text-white rounded">
+                View
+              </button>
+              <button onclick="openEditModal(${item.id}, '${item.user_id}', '${item.date}', '${item.day_name}')"
+                class="px-2 py-1 text-xs bg-yellow-500 text-white rounded">
+                Edit
+              </button>
+              <button onclick="deleteDustbin(${item.id})"
+                class="px-2 py-1 text-xs bg-red-500 text-white rounded">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `);
+      });
+
     });
+  }
 
-  })
-  .catch(error => {
-    console.error("API Error:", error);
-    alert("Something went wrong while fetching data.");
-  });
+  // Reset filters
+  window.resetFilters = function () {
+    document.getElementById("filterUser").value = "";
+    document.getElementById("filterDate").value = "";
+    document.getElementById("filterDay").value = "";
+    fetchDustbin();
+  };
+
+  // Debounce helper
+  function debounce(fn, delay) {
+    let timer;
+    return function () {
+      clearTimeout(timer);
+      timer = setTimeout(fn, delay);
+    };
+  }
 
 });
+
 
 /* VIEW FUNCTION */
 function viewDustbin(id) {
